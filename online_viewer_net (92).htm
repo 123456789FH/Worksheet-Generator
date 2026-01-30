@@ -1,0 +1,2774 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مولد أوراق العمل | رياضيات</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --ink:#111827;
+      --muted:#6b7280;
+      --dash:#9ca3af;
+
+      --accent:#7c5cff;
+      --accent2:#ef7aa8;
+      --good:#16a34a;
+      --bad:#dc2626;
+
+      /* print-friendly sizing */
+      --pagePad: 18px;
+      --pageBorder: 4px;
+      --innerInset: 9px;
+
+      --titleSize: 26px;
+      --infoSize: 13.8px;
+      --secSize: 15px;
+      --secNum: 18px;
+      --eqSize: 13.5px;
+
+      --blankW: 110px;
+
+      --card: rgba(255,255,255,.90);
+      --border: rgba(17,24,39,.12);
+      --shadow: 0 10px 30px rgba(17,24,39,.10);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:'Tajawal', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(239,122,168,.16) 0%, rgba(255,255,255,0) 60%),
+        radial-gradient(1000px 700px at 80% 20%, rgba(124,92,255,.14) 0%, rgba(255,255,255,0) 62%),
+        #ffffff;
+      min-height:100vh;
+    }
+    .wrap{ max-width:1180px; margin:auto; padding:16px; }
+
+    /* ===== Toast (minimal, not cluttering) ===== */
+    .toast{
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      margin: 0 auto;
+      max-width: 520px;
+      z-index: 9999;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(17,24,39,.14);
+      box-shadow: 0 10px 30px rgba(17,24,39,.12);
+      font-weight: 900;
+      color: rgba(17,24,39,.90);
+      display:none;
+      backdrop-filter: blur(10px);
+    }
+    .toast.show{ display:block; }
+    .toast.ok{ border-color: rgba(22,163,74,.25); background: rgba(22,163,74,.08); }
+    .toast.bad{ border-color: rgba(220,38,38,.25); background: rgba(220,38,38,.08); }
+
+    /* ===== App Bar ===== */
+    .appBar{
+      background: var(--card);
+      border: 1px solid rgba(124,92,255,.18);
+      border-radius: var(--radius);
+      padding: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      box-shadow: var(--shadow);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 280px;
+    }
+    .logoWrap{
+      width:52px;
+      height:52px;
+      border-radius:16px;
+      border: 1px solid rgba(124,92,255,.22);
+      background: linear-gradient(135deg, rgba(124,92,255,.12), rgba(239,122,168,.10));
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .logoWrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .brandTitle{
+      font-weight:1000;
+      font-size:18px;
+      line-height:1.2;
+    }
+    .brandSub{
+      font-weight:800;
+      font-size:12.5px;
+      color: var(--muted);
+      margin-top:2px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    .tabBtn{
+      border:none;
+      cursor:pointer;
+      padding:9px 12px;
+      border-radius: 999px;
+      background:#fff;
+      border:1px solid rgba(17,24,39,.12);
+      font-weight:1000;
+      transition:.12s ease;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .tabBtn.active{
+      background: linear-gradient(135deg, rgba(124,92,255,.18), rgba(239,122,168,.16));
+      border-color: rgba(124,92,255,.25);
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius: 14px;
+      background:#fff;
+      border:1px solid rgba(17,24,39,.12);
+      box-shadow: 0 6px 18px rgba(17,24,39,.08);
+      font-weight:1000;
+      transition: transform .12s ease, box-shadow .12s ease;
+      white-space:nowrap;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(17,24,39,.10); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(239,122,168,.90));
+      color:#fff;
+      border-color: transparent;
+      box-shadow: 0 10px 22px rgba(124,92,255,.18);
+    }
+    .btn.ghost{
+      background: transparent;
+      border-color: rgba(124,92,255,.22);
+      box-shadow:none;
+    }
+
+    /* ===== Panels ===== */
+    .panel{
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(17,24,39,.08);
+    }
+    .panelTitle{
+      font-weight:1000;
+      font-size:15px;
+      margin-bottom:10px;
+      color: rgba(17,24,39,.92);
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+    }
+    .col{ flex: 1 1 260px; min-width: 260px; }
+    .col.small{ flex: 1 1 180px; min-width: 180px; }
+    .col.tiny{ flex: 0 0 170px; min-width:170px; }
+
+    label{
+      display:block;
+      font-weight:1000;
+      font-size:12.5px;
+      color: rgba(17,24,39,.85);
+      margin:0 0 6px;
+    }
+    input[type="text"], select, textarea{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.14);
+      background:#fff;
+      font-weight:900;
+      outline:none;
+    }
+    textarea{
+      min-height: 70px;
+      resize: vertical;
+      font-weight:800;
+      line-height:1.6;
+    }
+    .check{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:1000;
+      cursor:pointer;
+      user-select:none;
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.10);
+      background:#fff;
+    }
+    .check input{ width:18px; height:18px; cursor:pointer; }
+
+    .hr{
+      height:1px;
+      background: rgba(17,24,39,.10);
+      margin: 12px 0;
+    }
+
+    /* ===== Question list ===== */
+    .qList{ display:flex; flex-direction:column; gap:8px; }
+    .qItem{
+      background:#fff;
+      border:1px solid rgba(17,24,39,.10);
+      border-radius: 16px;
+      padding:10px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .qMeta{
+      font-weight:900;
+      color: rgba(17,24,39,.86);
+      line-height:1.5;
+      max-width: 720px;
+    }
+    .qActions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius: 999px;
+      background: rgba(124,92,255,.10);
+      border: 1px solid rgba(124,92,255,.16);
+      font-weight:1000;
+      font-size:12px;
+    }
+    .thumbs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .thumb{
+      width: 84px;
+      height: 56px;
+      border-radius: 12px;
+      border: 1px solid rgba(17,24,39,.12);
+      object-fit: cover;
+      background:#fff;
+    }
+
+    /* ===== Worksheet Page ===== */
+    .page{
+      margin-top: 14px;
+      background:#fff;
+      border: var(--pageBorder) dashed var(--dash);
+      border-radius: 22px;
+      padding: var(--pagePad);
+      position:relative;
+    }
+    .page::before{
+      content:"";
+      position:absolute;
+      inset: var(--innerInset);
+      border: 2px solid #e5e7eb;
+      border-radius: 18px;
+      pointer-events:none;
+    }
+
+    .sheetTitle{
+      text-align:center;
+      font-weight:1000;
+      font-size: var(--titleSize);
+      margin: 2px 0 10px;
+      position:relative;
+      z-index:1;
+    }
+    .infoBar{
+      border: 2px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 8px 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin: 0 4px 10px;
+      position:relative;
+      z-index:1;
+    }
+    .infoItem{
+      font-weight:1000;
+      font-size: var(--infoSize);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color: rgba(17,24,39,.90);
+    }
+    .dots{
+      display:inline-block;
+      width: 300px;
+      max-width: 52vw;
+      border-bottom: 3px dotted rgba(17,24,39,.35);
+      transform: translateY(-2px);
+      height: 15px;
+    }
+    .dots.small{ width: 180px; max-width: 40vw; }
+
+    .sec{
+      margin: 8px 6px 0;
+      position:relative;
+      z-index:1;
+    }
+    .secHead{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      margin: 6px 0 6px;
+    }
+    .secNum{
+      font-weight:1000;
+      font-size: var(--secNum);
+      line-height: 1;
+      margin-top: 2px;
+      min-width: 24px;
+      text-align:center;
+      color: rgba(17,24,39,.88);
+    }
+    .secText{
+      font-weight:1000;
+      font-size: var(--secSize);
+      color: rgba(17,24,39,.88);
+      line-height:1.6;
+    }
+
+    .sec1Grid, .sec2Grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 12px;
+      align-items:start;
+    }
+    @media (max-width: 880px){
+      .sec1Grid, .sec2Grid{ grid-template-columns: 1fr; }
+      .col{ min-width: 220px; }
+    }
+
+    .cardQ{
+      border: 1px solid rgba(17,24,39,.10);
+      background: #fff;
+      border-radius: 16px;
+      padding: 10px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      break-inside: avoid;
+      position:relative;
+      overflow:hidden;
+    }
+    .cardQ::before{
+      content:"";
+      position:absolute;
+      inset:-60px -80px auto auto;
+      width:160px; height:160px;
+      border-radius:999px;
+      background: radial-gradient(circle at 40% 40%, rgba(124,92,255,.12), rgba(239,122,168,.08), rgba(255,255,255,0) 65%);
+      transform: rotate(20deg);
+      pointer-events:none;
+    }
+
+    .qPrompt{
+      font-weight:1000;
+      font-size: 13.6px;
+      line-height: 1.7;
+      color: rgba(17,24,39,.92);
+      position:relative;
+      z-index:1;
+      white-space: pre-wrap;
+    }
+
+    .mediaBox{
+      border: 1px dashed rgba(124,92,255,.30);
+      background: rgba(124,92,255,.05);
+      border-radius: 14px;
+      padding: 8px;
+      position:relative;
+      z-index:1;
+    }
+    .imgRow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+    }
+    .qImg{
+      max-width: 100%;
+      max-height: 120px;
+      border-radius: 12px;
+      border: 1px solid rgba(17,24,39,.10);
+      object-fit: contain;
+      background:#fff;
+    }
+    .svgWrap{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      overflow:hidden;
+    }
+
+    .eqRow{
+      width: 100%;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap: 10px;
+      font-weight:1000;
+      font-size: var(--eqSize);
+      color: rgba(17,24,39,.88);
+      position:relative;
+      z-index:1;
+      flex-wrap:wrap;
+    }
+
+    /* Expression: left operand then op then right operand, with direction:ltr to lock display.
+       For division/subtraction use: (left = divisor/subtrahend), (right = dividend/minuend) */
+    .expr{
+      min-width: 160px;
+      display:flex;
+      flex-direction:row;
+      direction:ltr;
+      justify-content:flex-end;
+      align-items:center;
+      gap:6px;
+      text-align:right;
+    }
+    .expr .num{ font-weight:1000; letter-spacing:.2px; }
+    .expr .op{ font-weight:1000; padding:0 2px; }
+
+    .blank{
+      display:inline-flex;
+      align-items:flex-end;
+      gap: 8px;
+    }
+    .ans{
+      width: var(--blankW);
+      padding: 7px 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.18);
+      font-weight:1000;
+      text-align:center;
+      outline:none;
+      background:#fff;
+      transition: box-shadow .12s ease, border-color .12s ease;
+      font-size: 13.5px;
+    }
+    .ans.correct{ border-color: rgba(22,163,74,.55); box-shadow: 0 0 0 4px rgba(22,163,74,.12); }
+    .ans.wrong{ border-color: rgba(220,38,38,.55); box-shadow: 0 0 0 4px rgba(220,38,38,.10); }
+
+    .printLine{
+      display:none;
+      width: calc(var(--blankW) + 18px);
+      border-bottom: 3px dotted rgba(17,24,39,.35);
+      transform: translateY(-2px);
+      height: 15px;
+    }
+
+    /* Answer-writing + related facts */
+    .noteBox{
+      border: 1px dashed rgba(239,122,168,.32);
+      background: rgba(239,122,168,.05);
+      border-radius: 14px;
+      padding: 8px 10px;
+      position:relative;
+      z-index:1;
+    }
+    .noteLabel{
+      font-weight:1000;
+      font-size: 12.6px;
+      color: rgba(17,24,39,.82);
+      margin-bottom: 6px;
+    }
+    .noteInput{
+      width:100%;
+      min-height: 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.16);
+      padding: 8px 10px;
+      font-weight:800;
+      outline:none;
+      resize: none;
+      line-height:1.6;
+      background:#fff;
+      font-size: 12.8px;
+    }
+    .factsInput{
+      width:100%;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.16);
+      padding: 8px 10px;
+      font-weight:900;
+      outline:none;
+      background:#fff;
+      font-size: 12.8px;
+    }
+    .noteInput.ok, .factsInput.ok{
+      border-color: rgba(22,163,74,.55);
+      box-shadow: 0 0 0 4px rgba(22,163,74,.12);
+    }
+    .noteInput.bad, .factsInput.bad{
+      border-color: rgba(220,38,38,.55);
+      box-shadow: 0 0 0 4px rgba(220,38,38,.10);
+    }
+    .notePrint{ display:none; margin-top: 6px; }
+    .noteLine{
+      height: 16px;
+      border-bottom: 2px dotted rgba(17,24,39,.35);
+      margin-top: 8px;
+    }
+    .factsPrint{
+      display:none;
+      height: 16px;
+      border-bottom: 2px dotted rgba(17,24,39,.35);
+      margin-top: 8px;
+    }
+
+    /* tables */
+    .tblWrap{
+      border: 1px dashed rgba(124,92,255,.28);
+      background: rgba(124,92,255,.05);
+      border-radius: 14px;
+      padding: 8px;
+      position:relative;
+      z-index:1;
+      overflow:auto;
+    }
+    table.wsTable{
+      width:100%;
+      border-collapse:collapse;
+      font-size: 12.6px;
+      background:#fff;
+      border-radius: 12px;
+      overflow:hidden;
+      border: 1px solid rgba(17,24,39,.10);
+    }
+    table.wsTable th, table.wsTable td{
+      border: 1px solid rgba(17,24,39,.10);
+      padding: 8px;
+      text-align:center;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    table.wsTable th{
+      background: rgba(124,92,255,.08);
+    }
+
+    /* MCQ */
+    .mcqList{ display:flex; flex-direction:column; gap:8px; position:relative; z-index:1; }
+    .mcqOpt{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      font-weight:1000;
+      font-size: 13px;
+      line-height:1.6;
+      padding:8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.10);
+      background: rgba(255,255,255,.9);
+      cursor:pointer;
+      user-select:none;
+    }
+    .mcqCircle{
+      width:16px; height:16px;
+      border-radius:999px;
+      border:2px solid rgba(17,24,39,.45);
+      margin-top: 2px;
+      flex:0 0 auto;
+      position:relative;
+    }
+    .mcqCircle.fill::after{
+      content:"";
+      position:absolute;
+      inset:3px;
+      border-radius:999px;
+      background: rgba(124,92,255,.85);
+    }
+    .mcqHidden{ display:none; }
+
+    .bottomBar{
+      margin: 10px 6px 0;
+      padding-top: 8px;
+      border-top: 1px solid rgba(17,24,39,.10);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      font-weight:1000;
+      color: rgba(17,24,39,.75);
+      position:relative;
+      z-index:1;
+      font-size: 12.8px;
+    }
+
+    /* Footer in app only */
+    .appFooter{
+      margin-top: 10px;
+      text-align:center;
+      font-weight:1000;
+      color: rgba(17,24,39,.70);
+      font-size: 12.6px;
+    }
+
+    /* Print */
+    @page{ size: A4; margin: 10mm; }
+    @media print{
+      body{ background:#fff; }
+      .wrap{ max-width: unset; padding:0; }
+      .noPrint{ display:none !important; }
+      .appFooter{ display:none !important; }
+      .toast{ display:none !important; }
+
+      .ans{ display:none !important; }
+      .printLine{ display:inline-block !important; }
+
+      .noteInput{ display:none !important; }
+      .factsInput{ display:none !important; }
+      .notePrint{ display:block !important; }
+      .factsPrint{ display:block !important; }
+
+      .page{ break-inside: avoid; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div class="wrap">
+
+    <!-- ===== APP BAR ===== -->
+    <div class="appBar noPrint">
+      <div class="brand">
+        <div class="logoWrap">
+          <img id="appLogo" alt="شعار الملتقى">
+        </div>
+        <div>
+          <div class="brandTitle">مولد أوراق العمل (رياضيات)</div>
+          <div class="brandSub">ملتقى التعليم التفاعلي</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tabBtn active" id="tabAuto" type="button">⚡ توليد تلقائي</button>
+        <button class="tabBtn" id="tabCustom" type="button">🧾 توليد ذاتي</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btnCheck" type="button">✅ تحقّق</button>
+        <button class="btn ghost" id="btnClear" type="button">🧹 مسح</button>
+        <button class="btn" id="btnPrint" type="button">🖨️ طباعة</button>
+      </div>
+    </div>
+
+    <!-- ===== AUTO PANEL ===== -->
+    <div class="panel noPrint" id="autoPanel">
+      <div class="panelTitle">التوليد التلقائي</div>
+
+      <div class="row">
+        <div class="col">
+          <label for="autoTitle">عنوان الدرس</label>
+          <input id="autoTitle" type="text" value="القسمة على ٥" />
+        </div>
+
+        <div class="col small">
+          <label for="autoTopic">نوع الدرس</label>
+          <select id="autoTopic">
+            <option value="auto" selected>تلقائي حسب العنوان</option>
+            <option value="add">جمع</option>
+            <option value="sub">طرح</option>
+            <option value="mul">ضرب</option>
+            <option value="div">قسمة</option>
+            <option value="fractions">كسور</option>
+            <option value="shape2d">أشكال ثنائية الأبعاد</option>
+            <option value="solids">مجسمات</option>
+            <option value="equations">معادلات</option>
+            <option value="functions">جداول دوال</option>
+          </select>
+        </div>
+
+        <div class="col small">
+          <label for="autoLevel">الصعوبة</label>
+          <select id="autoLevel">
+            <option value="easy" selected>سهل</option>
+            <option value="mid">متوسط</option>
+            <option value="hard">متقدم</option>
+          </select>
+        </div>
+
+        <div class="col small">
+          <label class="check" style="margin-top:22px;">
+            <input type="checkbox" id="autoVisuals" checked>
+            رسوم توضيحية
+          </label>
+        </div>
+
+        <div class="col tiny">
+          <button class="btn primary" id="btnAutoGenerate" type="button">✨ توليد</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CUSTOM PANEL ===== -->
+    <div class="panel noPrint" id="customPanel" style="display:none;">
+      <div class="panelTitle">التوليد الذاتي</div>
+
+      <div class="row">
+        <div class="col">
+          <label for="customTitle">عنوان ورقة العمل</label>
+          <input id="customTitle" type="text" value="ورقة عمل رياضيات" />
+        </div>
+        <div class="col small">
+          <label for="customGrade">الصف</label>
+          <select id="customGrade">
+            <option selected>ثالث</option>
+            <option>رابع</option>
+            <option>خامس</option>
+            <option>سادس</option>
+            <option>عام</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="customSec1Text">عنوان القسم (١)</label>
+          <input id="customSec1Text" type="text" value="أجب عن الأسئلة التالية:" />
+        </div>
+        <div class="col">
+          <label for="customSec2Text">عنوان القسم (٢)</label>
+          <input id="customSec2Text" type="text" value="تدريب إضافي:" />
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="panelTitle">إضافة/تعديل سؤال</div>
+
+      <div class="row">
+        <div class="col small">
+          <label for="qSection">القسم</label>
+          <select id="qSection">
+            <option value="1">القسم (١)</option>
+            <option value="2" selected>القسم (٢)</option>
+          </select>
+        </div>
+
+        <div class="col">
+          <label for="qType">نوع السؤال</label>
+          <select id="qType">
+            <option value="prompt" selected>سؤال حر (نص/صورة)</option>
+            <option value="expr">تعبير حسابي (جمع/طرح/ضرب/قسمة)</option>
+            <option value="fraction">كسر مع تمثيل</option>
+            <option value="shape2d">شكل ثنائي الأبعاد</option>
+            <option value="solid">مجسم</option>
+            <option value="equation">معادلة (س مجهول)</option>
+            <option value="functionTable">جدول دالة</option>
+            <option value="mcq">اختيار من متعدد</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="typeFields" style="margin-top:10px;"></div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="col">
+          <label>صور للسؤال (حتى صورتين)</label>
+          <input id="qImages" type="file" accept="image/*" multiple />
+          <div class="thumbs" id="imgPreview"></div>
+          <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn ghost" id="btnClearImages" type="button">🧹 مسح الصور</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="panelTitle">حقول إضافية (اختياري)</div>
+      <div class="row">
+        <div class="col">
+          <label class="check"><input type="checkbox" id="xAnswerWrite"> إضافة مساحة كتابة للطالب</label>
+          <div id="xAnswerWriteBox" style="display:none; margin-top:8px;">
+            <div class="row">
+              <div class="col">
+                <label for="xAnswerPrompt">عنوان الحقل</label>
+                <input id="xAnswerPrompt" type="text" value="اكتب إجابتك:">
+              </div>
+              <div class="col small">
+                <label for="xAnswerLines">عدد السطور</label>
+                <select id="xAnswerLines">
+                  <option value="1">١</option>
+                  <option value="2" selected>٢</option>
+                  <option value="3">٣</option>
+                  <option value="4">٤</option>
+                </select>
+              </div>
+              <div class="col small">
+                <label class="check" style="margin-top:22px;"><input type="checkbox" id="xAnswerRequired"> مطلوب</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <label class="check"><input type="checkbox" id="xFacts"> إضافة حقائق مترابطة</label>
+          <div id="xFactsBox" style="display:none; margin-top:8px;">
+            <div class="row">
+              <div class="col">
+                <label for="xFactsPrompt">عنوان الحقل</label>
+                <input id="xFactsPrompt" type="text" value="اكتب الحقائق المترابطة:">
+              </div>
+              <div class="col small">
+                <label class="check" style="margin-top:22px;"><input type="checkbox" id="xFactsRequired"> مطلوب</label>
+              </div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col">
+                <label for="xFactsKey">مفتاح صحيح (اختياري) — افصل بين أكثر من إجابة بـ |</label>
+                <input id="xFactsKey" type="text" placeholder="مثال: ٢×٤=٨ | ٨=٢×٤">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn primary" id="btnSaveQuestion" type="button">➕ إضافة السؤال</button>
+        <button class="btn ghost" id="btnCancelEdit" type="button" style="display:none;">إلغاء</button>
+
+        <button class="btn" id="btnExport" type="button">⬇️ تصدير</button>
+        <label class="btn" style="display:inline-flex; gap:8px; align-items:center; cursor:pointer;">
+          ⬆️ استيراد
+          <input id="importFile" type="file" accept="application/json" hidden />
+        </label>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="panelTitle">قائمة الأسئلة</div>
+      <div class="qList" id="questionList"></div>
+    </div>
+
+    <!-- ===== WORKSHEET ===== -->
+    <section class="page" id="page">
+      <div class="sheetTitle" id="sheetTitle">—</div>
+
+      <div class="infoBar">
+        <div class="infoItem">الاسم: <span class="dots"></span></div>
+        <div class="infoItem">الفصل: <span class="dots small"></span></div>
+      </div>
+
+      <div class="sec" id="sec1Wrap">
+        <div class="secHead">
+          <div class="secNum">١</div>
+          <div class="secText" id="sec1Text">—</div>
+        </div>
+        <div class="sec1Grid" id="sec1Grid"></div>
+      </div>
+
+      <div class="sec" style="margin-top:10px;" id="sec2Wrap">
+        <div class="secHead">
+          <div class="secNum">٢</div>
+          <div class="secText" id="sec2Text">—</div>
+        </div>
+        <div class="sec2Grid" id="sec2Grid"></div>
+      </div>
+
+      <div class="bottomBar">
+        <div id="gradeLine">الصف: ثالث</div>
+        <div>—</div>
+      </div>
+    </section>
+
+    <div class="appFooter noPrint">
+      أ/ فاطمة هزازي، | ملتقى معلمي ومعلمات الرياضيات | الملتقى التفاعلي
+    </div>
+  </div>
+
+  <script>
+    // ===== Logo (embedded, small) =====
+    const APP_LOGO_DATA_URI = "data:image/webp;base64,UklGRuAXAABXRUJQVlA4WAoAAAAQAAAAnwAAnwAAQUxQSBcAAAABDzD/ERGCTNqm/k337wQsov9J5jVgY+eKc8+e7S2l4S8wqO0OZJQmH1JQ1o0r8BqYlqHj3oV9Qz+fVQOQk2c2tqZ2n7b8QYgQ0m3S0H9eU2fZb4vQxQv8kQH2m5wqQZqC+Gq0m1l1r0Yt3b3d0lqgQ0mE+ZJ0l7QJq7m0n0mJbqkN2v8bq1d1kq7v9m7wQ8d6l6b8mQmOeQm0i1pY3l0uY6c9e4c3mQm9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4m9Y0m9m1mKZc3b4c3oYp4=";
+
+    // ===== Arabic digits helpers =====
+    const AR_NUMS = "٠١٢٣٤٥٦٧٨٩";
+    const FA_NUMS = "۰۱۲۳۴۵۶۷۸۹";
+    const toArabicDigits = (input) => String(input ?? "")
+      .replace(/\d/g, d => AR_NUMS[d])
+      .replace(/[۰-۹]/g, d => AR_NUMS[FA_NUMS.indexOf(d)]);
+    const toWesternDigits = (input) => String(input ?? "")
+      .replace(/[٠-٩]/g, d => String(AR_NUMS.indexOf(d)))
+      .replace(/[۰-۹]/g, d => String(FA_NUMS.indexOf(d)));
+    const parseNum = (v) => {
+      const s = toWesternDigits(String(v ?? "")).replace(/[^\d-]/g,'');
+      if(!s) return NaN;
+      return parseInt(s, 10);
+    };
+    const normalizeText = (s) => String(s ?? "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/[٠-٩]/g, d => String(AR_NUMS.indexOf(d)))
+      .toLowerCase();
+    const normalizeFact = (s) => {
+      let t = toWesternDigits(String(s || '')).toLowerCase();
+      t = t.replace(/\s+/g,'');
+      t = t.replace(/[×✕＊]/g,'x');
+      t = t.replace(/[*]/g,'x');
+      t = t.replace(/[＝]/g,'=');
+      t = t.replace(/[^0-9x=\/\\]/g,'');
+      return t;
+    };
+    const normalizeFrac = (s) => {
+      const t = toWesternDigits(String(s||'')).replace(/\s+/g,'');
+      const m = t.match(/^(\d{1,2})[\/\\](\d{1,2})$/);
+      if(m) return `${parseInt(m[1],10)}/${parseInt(m[2],10)}`;
+      return t.toLowerCase();
+    };
+
+    // ===== Helpers =====
+    const $ = (s, el=document)=> el.querySelector(s);
+    const $$ = (s, el=document)=> Array.from(el.querySelectorAll(s));
+    const randInt = (a,b)=> Math.floor(Math.random()*(b-a+1))+a;
+    const pick = (arr)=> arr[Math.floor(Math.random()*arr.length)];
+    const clamp = (n,a,b)=> Math.max(a, Math.min(b,n));
+    const uid = ()=> "q_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
+    const NAMES = ["خالد","سلمان","ناصر","سعد","فهد","مازن","تركي","راشد"];
+
+    // ===== Toast =====
+    let toastTimer = null;
+    function showToast(msg, type=""){
+      const t = $('#toast');
+      t.className = "toast show " + (type || "");
+      t.textContent = toArabicDigits(msg);
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>{ t.className="toast"; }, 2400);
+    }
+
+    // ===== Set logo =====
+    $('#appLogo').src = APP_LOGO_DATA_URI;
+
+    // ===== SVG builders (auto visuals) =====
+    function svgWrap(svg){ return `<div class="svgWrap">${svg}</div>`; }
+
+    function svgNumberLineAdd(a,b){
+      const end = Math.min(a+b, 30), w=300,h=110,pad=22;
+      const span = Math.max(1,end), step = (w - pad*2)/span;
+      const xA = pad + Math.min(a,end)*step;
+      const xB = pad + Math.min(a+b,end)*step;
+      let ticks='';
+      for(let i=0;i<=end;i++){
+        const x = pad + i*step;
+        const major = (i%5===0) ? 1 : 0;
+        ticks += `<line x1="${x}" y1="70" x2="${x}" y2="${major?58:62}" stroke="rgba(17,24,39,.55)" stroke-width="${major?2:1}"/>`;
+        if(major){
+          ticks += `<text x="${x}" y="92" text-anchor="middle" font-size="11" font-weight="900" font-family="Tajawal" fill="rgba(17,24,39,.85)">${toArabicDigits(i)}</text>`;
+        }
+      }
+      return `
+      <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="rgba(124,92,255,.05)" stroke="rgba(17,24,39,.18)"/>
+        <text x="${w/2}" y="28" text-anchor="middle" font-size="13" font-weight="900" font-family="Tajawal" fill="rgba(17,24,39,.80)">
+          خط أعداد: + ${toArabicDigits(b)}
+        </text>
+        <line x1="${pad}" y1="70" x2="${w-pad}" y2="70" stroke="rgba(17,24,39,.45)" stroke-width="3"/>
+        ${ticks}
+        <circle cx="${xA}" cy="70" r="6" fill="rgba(239,122,168,.85)"/>
+        <circle cx="${xB}" cy="70" r="6" fill="rgba(124,92,255,.85)"/>
+        <path d="M ${xA} 45 C ${(xA+xB)/2} 15 ${(xA+xB)/2} 15 ${xB} 45" fill="none" stroke="rgba(124,92,255,.85)" stroke-width="3"/>
+        <polygon points="${xB},45 ${xB-8},52 ${xB+8},52" fill="rgba(124,92,255,.85)"/>
+      </svg>`;
+    }
+
+    function svgNumberLineSub(a,b){
+      const end = Math.min(a, 30), w=300,h=110,pad=22;
+      const span = Math.max(1,end), step = (w - pad*2)/span;
+      const xA = pad + Math.min(a,end)*step;
+      const xB = pad + Math.max(0, a-b)*step;
+      let ticks='';
+      for(let i=0;i<=end;i++){
+        const x = pad + i*step;
+        const major = (i%5===0) ? 1 : 0;
+        ticks += `<line x1="${x}" y1="70" x2="${x}" y2="${major?58:62}" stroke="rgba(17,24,39,.55)" stroke-width="${major?2:1}"/>`;
+        if(major){
+          ticks += `<text x="${x}" y="92" text-anchor="middle" font-size="11" font-weight="900" font-family="Tajawal" fill="rgba(17,24,39,.85)">${toArabicDigits(i)}</text>`;
+        }
+      }
+      return `
+      <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="rgba(239,122,168,.05)" stroke="rgba(17,24,39,.18)"/>
+        <text x="${w/2}" y="28" text-anchor="middle" font-size="13" font-weight="900" font-family="Tajawal" fill="rgba(17,24,39,.80)">
+          خط أعداد: − ${toArabicDigits(b)}
+        </text>
+        <line x1="${pad}" y1="70" x2="${w-pad}" y2="70" stroke="rgba(17,24,39,.45)" stroke-width="3"/>
+        ${ticks}
+        <circle cx="${xA}" cy="70" r="6" fill="rgba(124,92,255,.85)"/>
+        <circle cx="${xB}" cy="70" r="6" fill="rgba(239,122,168,.85)"/>
+        <path d="M ${xA} 45 C ${(xA+xB)/2} 15 ${(xA+xB)/2} 15 ${xB} 45" fill="none" stroke="rgba(239,122,168,.85)" stroke-width="3"/>
+        <polygon points="${xB},45 ${xB-8},52 ${xB+8},52" fill="rgba(239,122,168,.85)"/>
+      </svg>`;
+    }
+
+    function svgArray(rows, cols){
+      const w=300,h=130;
+      const cell=14,gap=6;
+      const gridW = cols*cell + (cols-1)*gap;
+      const gridH = rows*cell + (rows-1)*gap;
+      const x0 = Math.max(18, (w-gridW)/2);
+      const y0 = 44;
+      let out='';
+      const capCells = Math.min(rows*cols, 48);
+      for(let i=0;i<capCells;i++){
+        const r = Math.floor(i/cols), c=i%cols;
+        out += `<rect x="${x0+c*(cell+gap)}" y="${y0+r*(cell+gap)}" width="${cell}" height="${cell}" rx="3"
+                fill="rgba(124,92,255,.12)" stroke="rgba(17,24,39,.12)"/>`;
+      }
+      return `
+      <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="rgba(124,92,255,.05)" stroke="rgba(17,24,39,.18)"/>
+        <text x="${w/2}" y="28" text-anchor="middle" font-size="13" font-weight="900" font-family="Tajawal" fill="rgba(17,24,39,.80)">
+          شبكة: ${toArabicDigits(rows)} × ${toArabicDigits(cols)}
+        </text>
+        ${out}
+      </svg>`;
+    }
+
+    function svgGroups(divisor, quotient){
+      const w=300,h=140,pad=16;
+      const cols = divisor<=4 ? divisor : 3;
+      const rows = Math.ceil(divisor/cols);
+      const boxW = (w - pad*2 - (cols-1)*10) / cols;
+      const boxH = (h - 50 - pad - (rows-1)*10) / rows;
+
+      let g='';
+      for(let i=0;i<divisor;i++){
+        const r = Math.floor(i/cols), c=i%cols;
+        const x = pad + c*(boxW+10);
+        const y = 42 + r*(boxH+10);
+        g += `<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" rx="14" fill="rgba(239,122,168,.05)" stroke="rgba(17,24,39,.25)"/>`;
+
+        const dot = 6;
+        const perRow = Math.max(1, Math.floor((boxW-16)/(dot+6)));
+        for(let k=0;k<quotient;k++){
+          const rr = Math.floor(k/perRow), cc = k%perRow;
+          const dx = x+14 + cc*(dot+6);
+          const dy = y+18 + rr*(dot+8);
+          g += `<circle cx="${dx}" cy="${dy}" r="${dot/2}" fill="rgba(124,92,255,.75)"/>`;
+        }
+      }
+
+      return `
+      <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="rgba(239,122,168,.05)" stroke="rgba(17,24,39,.18)"/>
+        <text x="${w/2}" y="26" text-anchor="middle" font-size="13" font-weight="900" font-family="Tajawal" fill="rgba(17,24,39,.80)">
+          مجموعات: ${toArabicDigits(divisor)} × (في كل مجموعة ${toArabicDigits(quotient)})
+        </text>
+        ${g}
+      </svg>`;
+    }
+
+    function svgFractionBar(numer, denom){
+      const w = 300, h = 70, pad = 10;
+      const partW = (w - pad*2) / denom;
+      let rects = '';
+      for(let i=0;i<denom;i++){
+        const x = pad + i*partW;
+        const fill = (i < numer) ? 'rgba(124,92,255,.55)' : 'rgba(255,255,255,1)';
+        rects += `<rect x="${x}" y="${pad}" width="${partW-2}" height="${h-pad*2}" rx="8" ry="8" fill="${fill}" stroke="rgba(17,24,39,.35)" />`;
+      }
+      return `
+        <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="rgba(239,122,168,.05)" stroke="rgba(17,24,39,.18)"/>
+          ${rects}
+        </svg>`;
+    }
+
+    function svgPolygon(name){
+      const w=300,h=160;
+      const pts = {
+        triangle: "150,20 270,140 30,140",
+        square: "90,30 210,30 210,150 90,150",
+        rectangle: "60,55 240,55 240,140 60,140",
+        pentagon: "150,20 270,70 220,155 80,155 30,70",
+        hexagon: "150,20 250,60 250,140 150,180 50,140 50,60"
+      };
+      const p = pts[name] || pts.triangle;
+      return `
+        <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="rgba(124,92,255,.05)" stroke="rgba(17,24,39,.18)"/>
+          <polygon points="${p}" fill="rgba(124,92,255,.18)" stroke="rgba(17,24,39,.55)" stroke-width="3" />
+        </svg>`;
+    }
+
+    function svgSolid(name){
+      const w=300,h=170;
+      if(name==="cube"){
+        return `
+        <svg width="${w}" height="${h}" viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
+          <rect x="90" y="70" width="100" height="75" fill="rgba(124,92,255,.15)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+          <polygon points="90,70 120,45 220,45 190,70" fill="rgba(239,122,168,.12)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+          <polygon points="190,70 220,45 220,120 190,145" fill="rgba(124,92,255,.10)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+          <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="transparent" stroke="rgba(17,24,39,.18)"/>
+        </svg>`;
+      }
+      if(name==="cylinder"){
+        return `
+        <svg width="${w}" height="${h}" viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="150" cy="55" rx="70" ry="18" fill="rgba(239,122,168,.18)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+          <rect x="80" y="55" width="140" height="80" fill="rgba(124,92,255,.12)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+          <ellipse cx="150" cy="135" rx="70" ry="18" fill="rgba(124,92,255,.12)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+          <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="transparent" stroke="rgba(17,24,39,.18)"/>
+        </svg>`;
+      }
+      if(name==="cone"){
+        return `
+        <svg width="${w}" height="${h}" viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="150" cy="135" rx="80" ry="18" fill="rgba(124,92,255,.12)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+          <polygon points="150,35 70,135 230,135" fill="rgba(239,122,168,.16)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+          <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="transparent" stroke="rgba(17,24,39,.18)"/>
+        </svg>`;
+      }
+      return `
+      <svg width="${w}" height="${h}" viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="150" cy="95" r="65" fill="rgba(124,92,255,.12)" stroke="rgba(17,24,39,.55)" stroke-width="3"/>
+        <ellipse cx="150" cy="95" rx="65" ry="18" fill="transparent" stroke="rgba(17,24,39,.35)" stroke-width="3"/>
+        <ellipse cx="150" cy="95" rx="18" ry="65" fill="transparent" stroke="rgba(17,24,39,.25)" stroke-width="3"/>
+        <rect x="6" y="6" width="${w-12}" height="${h-12}" rx="16" fill="transparent" stroke="rgba(17,24,39,.18)"/>
+      </svg>`;
+    }
+
+    function svgFunctionTable(ruleText, inputs, outputs, blanksMask){
+      const cols = inputs.length;
+      let th = `<th>المدخل</th>` + inputs.map(x=>`<th>${toArabicDigits(x)}</th>`).join('');
+      let outRow = `<td>المخرج</td>`;
+      for(let i=0;i<cols;i++){
+        if(blanksMask[i]){
+          outRow += `<td data-blank="1" data-correct="${outputs[i]}"></td>`;
+        }else{
+          outRow += `<td>${toArabicDigits(outputs[i])}</td>`;
+        }
+      }
+      return `
+        <div class="tblWrap">
+          <div style="font-weight:1000; color:rgba(17,24,39,.80); margin-bottom:6px;">قاعدة الدالة: ${toArabicDigits(ruleText)}</div>
+          <table class="wsTable">
+            <tr>${th}</tr>
+            <tr>${outRow}</tr>
+          </table>
+        </div>`;
+    }
+
+    // ===== Render helpers =====
+    function renderMedia(media){
+      if(!media) return null;
+      const mediaEl = document.createElement('div');
+      mediaEl.className = 'mediaBox';
+
+      if(media.type === "svg"){
+        mediaEl.innerHTML = svgWrap(media.svg);
+        return mediaEl;
+      }
+      if(media.type === "images" && media.images?.length){
+        const row = document.createElement('div');
+        row.className = 'imgRow';
+        media.images.slice(0,2).forEach(src=>{
+          const img = document.createElement('img');
+          img.className = 'qImg';
+          img.src = src;
+          img.alt = 'صورة';
+          row.appendChild(img);
+        });
+        mediaEl.appendChild(row);
+        return mediaEl;
+      }
+      return null;
+    }
+
+    function buildExpr(leftOperand, op, rightOperand){
+      const el = document.createElement('div');
+      el.className = 'expr';
+      const left = document.createElement('span'); left.className='num'; left.textContent = toArabicDigits(leftOperand);
+      const o = document.createElement('span'); o.className='op'; o.textContent = op;
+      const right = document.createElement('span'); right.className='num'; right.textContent = toArabicDigits(rightOperand);
+      el.appendChild(left); el.appendChild(o); el.appendChild(right);
+      return el;
+    }
+
+    function makePrintLines(n){
+      const box = document.createElement('div');
+      box.className = 'notePrint printOnly';
+      const lines = Math.max(1, Math.min(5, parseInt(n||1,10)));
+      for(let i=0;i<lines;i++){
+        const line = document.createElement('div');
+        line.className = 'noteLine';
+        box.appendChild(line);
+      }
+      return box;
+    }
+
+    function renderExtras(q, parent){
+      if(q.answerWrite?.enabled){
+        const box = document.createElement('div');
+        box.className = 'noteBox';
+        const label = document.createElement('div');
+        label.className = 'noteLabel';
+        label.textContent = toArabicDigits(q.answerWrite.prompt || "اكتب إجابتك:");
+        const ta = document.createElement('textarea');
+        ta.className = 'noteInput noPrint';
+        ta.placeholder = '...';
+        ta.dataset.required = q.answerWrite.required ? "1" : "0";
+        const lines = Math.max(1, Math.min(5, parseInt(q.answerWrite.lines||2,10)));
+        ta.rows = lines;
+        ta.addEventListener('blur', ()=>{ ta.value = toArabicDigits(ta.value); });
+        box.appendChild(label);
+        box.appendChild(ta);
+        box.appendChild(makePrintLines(lines));
+        parent.appendChild(box);
+      }
+
+      if(q.facts?.enabled){
+        const box = document.createElement('div');
+        box.className = 'noteBox';
+        const label = document.createElement('div');
+        label.className = 'noteLabel';
+        label.textContent = toArabicDigits(q.facts.prompt || "اكتب الحقائق المترابطة:");
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'factsInput noPrint';
+        inp.placeholder = '...';
+        inp.dataset.required = q.facts.required ? "1" : "0";
+        inp.dataset.key = (q.facts.key||"").trim();
+        inp.addEventListener('input', ()=>{ inp.value = toArabicDigits(inp.value); });
+        const print = document.createElement('div');
+        print.className = 'factsPrint printOnly';
+        box.appendChild(label);
+        box.appendChild(inp);
+        box.appendChild(print);
+        parent.appendChild(box);
+      }
+    }
+
+    function makeAnswerInput({correctValue=null, answerType="num"}){
+      const span = document.createElement('span');
+      span.className = 'blank';
+
+      const inp = document.createElement('input');
+      inp.className = 'ans noPrint';
+      inp.type = 'text';
+      inp.autocomplete = "off";
+      inp.spellcheck = false;
+      inp.dataset.atype = answerType;
+
+      if(answerType === "num"){
+        inp.inputMode = "numeric";
+        inp.dataset.correct = (correctValue===null || correctValue===undefined || correctValue==="") ? "" : String(correctValue);
+        inp.addEventListener('input', ()=>{
+          const raw = toWesternDigits(inp.value).replace(/[^\d-]/g,'');
+          inp.value = toArabicDigits(raw);
+        });
+      } else if(answerType === "frac"){
+        inp.inputMode = "text";
+        inp.dataset.correct = (correctValue===null || correctValue===undefined || correctValue==="") ? "" : normalizeFrac(correctValue);
+        inp.placeholder = "مثال: ٣/٤";
+        inp.addEventListener('blur', ()=>{ inp.value = toArabicDigits(inp.value); });
+      } else {
+        inp.inputMode = "text";
+        inp.dataset.correct = (correctValue===null || correctValue===undefined || correctValue==="") ? "" : normalizeText(correctValue);
+        inp.addEventListener('blur', ()=>{ inp.value = toArabicDigits(inp.value); });
+      }
+
+      const line = document.createElement('span');
+      line.className = 'printLine printOnly';
+
+      span.appendChild(inp);
+      span.appendChild(line);
+      return span;
+    }
+
+    function renderQuestion(q){
+      const card = document.createElement('div');
+      card.className = 'cardQ';
+
+      const m = renderMedia(q.media);
+      if(m) card.appendChild(m);
+
+      if(q.prompt){
+        const p = document.createElement('div');
+        p.className = 'qPrompt';
+        p.textContent = toArabicDigits(q.prompt);
+        card.appendChild(p);
+      }
+
+      if(q.type === "expr"){
+        const row = document.createElement('div');
+        row.className = 'eqRow';
+
+        // leftOperand on the left, rightOperand on the right (locked by direction:ltr)
+        // For division: left = divisor, right = dividend (big number on right)
+        const expr = buildExpr(q.left, q.op, q.right);
+
+        const eq = document.createElement('div');
+        eq.textContent = "=";
+
+        const blank = makeAnswerInput({ correctValue: q.correct ?? "", answerType: q.answerType ?? "num" });
+
+        row.appendChild(expr);
+        row.appendChild(eq);
+        row.appendChild(blank);
+        card.appendChild(row);
+      }
+
+      if(q.type === "prompt"){
+        const row = document.createElement('div');
+        row.className = 'eqRow';
+        const blank = makeAnswerInput({ correctValue: q.correct ?? "", answerType: q.answerType ?? "num" });
+        row.appendChild(blank);
+        card.appendChild(row);
+      }
+
+      if(q.type === "equation"){
+        const row = document.createElement('div');
+        row.className = 'eqRow';
+
+        const t = document.createElement('div');
+        t.style.fontWeight = "1000";
+        t.textContent = toArabicDigits(q.eqText || "أوجد قيمة س:");
+
+        const blank = makeAnswerInput({ correctValue: q.correct ?? "", answerType:"num" });
+        row.appendChild(t);
+        row.appendChild(blank);
+
+        const eqLine = document.createElement('div');
+        eqLine.className = 'qPrompt';
+        eqLine.textContent = toArabicDigits(q.equation || "");
+
+        card.appendChild(row);
+        card.appendChild(eqLine);
+      }
+
+      if(q.type === "table"){
+        const holder = document.createElement('div');
+        holder.className = 'tblWrap';
+        holder.innerHTML = q.tableHtml || "";
+        $$('td[data-blank="1"]', holder).forEach(td=>{
+          const correct = td.getAttribute('data-correct') || "";
+          td.innerHTML = "";
+          td.appendChild(makeAnswerInput({ correctValue: correct, answerType:"num" }));
+        });
+        card.appendChild(holder);
+      }
+
+      if(q.type === "mcq"){
+        const list = document.createElement('div');
+        list.className = 'mcqList';
+
+        q.options.forEach((opt, idx)=>{
+          const optEl = document.createElement('div');
+          optEl.className = 'mcqOpt';
+
+          const circle = document.createElement('span');
+          circle.className = 'mcqCircle';
+
+          const txt = document.createElement('div');
+          txt.textContent = toArabicDigits(opt);
+
+          const hidden = document.createElement('input');
+          hidden.type = "radio";
+          hidden.name = "mcq_" + q.id;
+          hidden.value = String(idx);
+          hidden.className = "mcqHidden";
+          hidden.dataset.correct = (q.correctIndex ?? -1);
+
+          optEl.addEventListener('click', ()=>{
+            $$(`input[name="mcq_${q.id}"]`).forEach(r=> r.checked = false);
+            hidden.checked = true;
+            $$('.mcqCircle', list).forEach(c=> c.classList.remove('fill'));
+            circle.classList.add('fill');
+          });
+
+          optEl.appendChild(circle);
+          optEl.appendChild(txt);
+          optEl.appendChild(hidden);
+          list.appendChild(optEl);
+        });
+
+        card.appendChild(list);
+      }
+
+      renderExtras(q, card);
+      return card;
+    }
+
+    function renderWorksheet(ws){
+      $('#sheetTitle').textContent = toArabicDigits(ws.title || "ورقة عمل");
+      $('#sec1Text').textContent = toArabicDigits(ws.sec1Text || "القسم (١)");
+      $('#sec2Text').textContent = toArabicDigits(ws.sec2Text || "القسم (٢)");
+      $('#gradeLine').textContent = toArabicDigits(`الصف: ${ws.grade || "ثالث"}`);
+
+      const s1 = $('#sec1Grid'); s1.innerHTML = '';
+      const s2 = $('#sec2Grid'); s2.innerHTML = '';
+
+      (ws.sec1 || []).forEach(q=> s1.appendChild(renderQuestion(q)));
+      (ws.sec2 || []).forEach(q=> s2.appendChild(renderQuestion(q)));
+
+      $('#sec1Wrap').style.display = (ws.sec1 && ws.sec1.length) ? "block" : "none";
+      $('#sec2Wrap').style.display = (ws.sec2 && ws.sec2.length) ? "block" : "none";
+    }
+
+    // ===== Auto topic detection =====
+    function detectTopicFromTitle(title){
+      const t = normalizeText(title);
+      if(!t) return "add";
+      if(t.includes("جمع")) return "add";
+      if(t.includes("طرح")) return "sub";
+      if(t.includes("ضرب")) return "mul";
+      if(t.includes("قسمة") || t.includes("القسمة")) return "div";
+      if(t.includes("كسر") || t.includes("كسور") || t.includes("مقام") || t.includes("بسط")) return "fractions";
+      if(t.includes("شكل") || t.includes("اشكال") || t.includes("ثنائي") || t.includes("أضلاع") || t.includes("زوايا")) return "shape2d";
+      if(t.includes("مجسم") || t.includes("مجسمات") || t.includes("وجه") || t.includes("حرف") || t.includes("رأس")) return "solids";
+      if(t.includes("معادلة") || t.includes("معادلات") || t.includes("مجهول")) return "equations";
+      if(t.includes("دالة") || t.includes("دوال") || t.includes("جدول") || t.includes("مدخلات") || t.includes("مخرجات")) return "functions";
+      return "add";
+    }
+
+    // ===== Auto generators (with optional visuals) =====
+    function genAdd(level, visuals){
+      const a = randInt(6, 14);
+      const b = randInt(4, 10);
+      const a2 = randInt(10, 20);
+      const b2 = randInt(8, 15);
+      const name = pick(NAMES);
+      const apples = randInt(12, 28);
+
+      return {
+        title: "ورقة عمل: الجمع",
+        grade: "ثالث",
+        sec1Text: "أجب عن الأسئلة التالية:",
+        sec2Text: "تدريب إضافي:",
+        sec1: [
+          {
+            id: uid(),
+            type:"expr",
+            op:"+",
+            left: b,    // left side
+            right: a,   // right side
+            correct: a+b,
+            prompt:"احسب ناتج الجمع:",
+            answerType:"num",
+            media: visuals ? { type:"svg", svg: svgNumberLineAdd(a,b) } : null
+          },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:`لدى ${name} ${toArabicDigits(apples)} تفاحة. أضاف ${toArabicDigits(12)} تفاحة. المجموع =`,
+            correct: apples+12,
+            answerType:"num"
+          }
+        ],
+        sec2: [
+          { id: uid(), type:"expr", op:"+", left:b2, right:a2, correct:a2+b2, prompt:"احسب:", answerType:"num" },
+          { id: uid(), type:"expr", op:"+", left:randInt(10,25), right:randInt(15,30), correct:null, prompt:"احسب:", answerType:"num" },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب حقيقة جمع مرتبطة (مثال: ١٢ + ٨ = ٢٠):",
+            correct:"",
+            answerType:"text",
+            facts:{ enabled:true, prompt:"اكتب الحقائق المترابطة:", required:false, key:"" }
+          },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب إجابتك: كيف عرفت الناتج؟",
+            correct:"",
+            answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false }
+          }
+        ]
+      };
+    }
+
+    function genSub(level, visuals){
+      const a = randInt(14, 28);
+      const b = randInt(4, 12);
+      const a2 = randInt(20, 40);
+      const b2 = randInt(8, 18);
+      const name = pick(NAMES);
+      const pencils = randInt(18, 40);
+      const give = randInt(5, 15);
+
+      const q3 = randInt(30, 60);
+      const q4 = randInt(10, 25);
+
+      return {
+        title: "ورقة عمل: الطرح",
+        grade: "ثالث",
+        sec1Text: "أجب عن الأسئلة التالية:",
+        sec2Text: "تدريب إضافي:",
+        sec1: [
+          {
+            id: uid(),
+            type:"expr",
+            op:"−",
+            left: b,      // subtrahend on left
+            right: a,     // minuend (big) on right
+            correct: a-b,
+            prompt:"احسب ناتج الطرح:",
+            answerType:"num",
+            media: visuals ? { type:"svg", svg: svgNumberLineSub(a,b) } : null
+          },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:`مع ${name} ${toArabicDigits(pencils)} قلمًا. أعطى زميله ${toArabicDigits(give)}. المتبقي =`,
+            correct: pencils-give,
+            answerType:"num"
+          }
+        ],
+        sec2: [
+          { id: uid(), type:"expr", op:"−", left:b2, right:a2, correct:a2-b2, prompt:"احسب:", answerType:"num" },
+          { id: uid(), type:"expr", op:"−", left:q4, right:q3, correct:q3-q4, prompt:"احسب:", answerType:"num" },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب إجابتك: ما الخطوة الأولى في الطرح؟",
+            correct:"",
+            answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false }
+          },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب حقيقة طرح مرتبطة (مثال: ٢٠ − ٨ = ١٢):",
+            correct:"",
+            answerType:"text",
+            facts:{ enabled:true, prompt:"اكتب الحقائق المترابطة:", required:false, key:"" }
+          }
+        ]
+      };
+    }
+
+    function genMul(level, visuals){
+      const maxF = (level==="easy") ? 6 : (level==="mid" ? 9 : 12);
+      const rows = randInt(2, maxF);
+      const cols = randInt(2, maxF);
+      const a2 = randInt(2, maxF);
+      const b2 = randInt(2, maxF);
+
+      return {
+        title: "ورقة عمل: الضرب",
+        grade: "ثالث",
+        sec1Text: "أجب عن الأسئلة التالية:",
+        sec2Text: "تدريب إضافي:",
+        sec1: [
+          {
+            id: uid(),
+            type:"expr",
+            op:"×",
+            left: cols,
+            right: rows,
+            correct: rows*cols,
+            prompt:"احسب ناتج الضرب:",
+            answerType:"num",
+            media: visuals ? { type:"svg", svg: svgArray(rows, cols) } : null,
+            facts:{ enabled:true, prompt:"اكتب الحقائق المترابطة:", required:false, key:"" }
+          },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب عاملًا ناقصًا: □ × ٤ = ٢٠",
+            correct: 5,
+            answerType:"num"
+          }
+        ],
+        sec2: [
+          { id: uid(), type:"expr", op:"×", left:b2, right:a2, correct:a2*b2, prompt:"احسب:", answerType:"num" },
+          { id: uid(), type:"expr", op:"×", left:randInt(2,maxF), right:randInt(2,maxF), correct:null, prompt:"احسب:", answerType:"num" },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب إجابتك: كيف استخدمت الشبكة؟",
+            correct:"",
+            answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false }
+          },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب حقيقة ضرب مرتبطة:",
+            correct:"",
+            answerType:"text",
+            facts:{ enabled:true, prompt:"اكتب الحقائق المترابطة:", required:false, key:"" }
+          }
+        ]
+      };
+    }
+
+    function extractDivisor(title){
+      const norm = toWesternDigits(title||'');
+      const m = norm.match(/على\s*(\d{1,2})/);
+      if(m) return clamp(parseInt(m[1],10), 2, 12);
+      const m2 = norm.match(/(\d{1,2})/);
+      if(m2) return clamp(parseInt(m2[1],10), 2, 12);
+      return 2;
+    }
+
+    function genDiv(level, title, visuals){
+      const d = extractDivisor(title);
+      const q1 = randInt(2, Math.min(5, Math.floor(30/d)));
+      const q2 = randInt(2, Math.min(5, Math.floor(30/d)));
+      const n1 = d*q1;
+      const n2 = d*q2;
+
+      const q3 = d*randInt(4,8);
+      const q4 = d*randInt(4,8);
+
+      return {
+        title: title || `ورقة عمل: القسمة على ${toArabicDigits(d)}`,
+        grade: "ثالث",
+        sec1Text: "أجد ناتج القسمة:",
+        sec2Text: "تدريب إضافي:",
+        sec1: [
+          {
+            id: uid(),
+            type:"expr",
+            op:"÷",
+            left: d,      // divisor on left
+            right: n1,    // dividend (big) on right
+            correct: q1,
+            prompt:"احسب:",
+            answerType:"num",
+            media: visuals ? { type:"svg", svg: svgGroups(d, q1) } : null,
+            facts:{ enabled:true, prompt:"اكتب الحقائق المترابطة:", required:false, key:"" }
+          },
+          {
+            id: uid(),
+            type:"expr",
+            op:"÷",
+            left: d,
+            right: n2,
+            correct: q2,
+            prompt:"احسب:",
+            answerType:"num",
+            media: visuals ? { type:"svg", svg: svgGroups(d, q2) } : null,
+            facts:{ enabled:true, prompt:"اكتب الحقائق المترابطة:", required:false, key:"" }
+          }
+        ],
+        sec2: [
+          { id: uid(), type:"expr", op:"÷", left:d, right:q3, correct:q3/d, prompt:"احسب:", answerType:"num" },
+          { id: uid(), type:"expr", op:"÷", left:d, right:q4, correct:q4/d, prompt:"احسب:", answerType:"num" },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب إجابتك: ما العلاقة بين القسمة والضرب؟",
+            correct:"",
+            answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false }
+          },
+          {
+            id: uid(),
+            type:"prompt",
+            prompt:"اكتب حقيقة ضرب مرتبطة بالقسمة:",
+            correct:"",
+            answerType:"text",
+            facts:{ enabled:true, prompt:"اكتب الحقائق المترابطة:", required:false, key:"" }
+          }
+        ]
+      };
+    }
+
+    function genFractions(level, visuals){
+      const denoms = (level==="easy") ? [2,3,4] : (level==="mid" ? [2,3,4,6] : [2,3,4,6,8]);
+      const d1 = pick(denoms);
+      const n1 = randInt(1, d1-1);
+      const d2 = pick(denoms);
+      const n2 = randInt(1, d2-1);
+
+      return {
+        title:"ورقة عمل: الكسور",
+        grade:"ثالث",
+        sec1Text:"أكتب الكسر المناسب:",
+        sec2Text:"تدريب إضافي:",
+        sec1:[
+          { id: uid(), type:"prompt", prompt:"اكتب الكسر الممثل بالشكل:", correct:`${n1}/${d1}`, answerType:"frac",
+            media: visuals ? { type:"svg", svg: svgFractionBar(n1,d1) } : null },
+          { id: uid(), type:"prompt", prompt:"اكتب الكسر الممثل بالشكل:", correct:`${n2}/${d2}`, answerType:"frac",
+            media: visuals ? { type:"svg", svg: svgFractionBar(n2,d2) } : null }
+        ],
+        sec2:[
+          { id: uid(), type:"prompt", prompt:"أكمل: ١/٢ = □/٤", correct:"2/4", answerType:"frac" },
+          { id: uid(), type:"mcq", prompt:"اختر الكسر الأكبر:", options:["١/٤","٣/٤","٢/٤"], correctIndex:1 },
+          { id: uid(), type:"prompt", prompt:"اكتب إجابتك: ما معنى البسط والمقام؟", correct:"", answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false } },
+          { id: uid(), type:"prompt", prompt:"اكتب حقيقة كسر مكافئ (مثال: ٢/٤ = ١/٢):", correct:"", answerType:"text",
+            facts:{ enabled:true, prompt:"اكتب الحقائق المترابطة:", required:false, key:"" } }
+        ]
+      };
+    }
+
+    function genShape2D(level, visuals){
+      const shapes = [
+        {k:"triangle", name:"مثلث", sides:3},
+        {k:"square", name:"مربع", sides:4},
+        {k:"rectangle", name:"مستطيل", sides:4},
+        {k:"pentagon", name:"خماسي", sides:5},
+        {k:"hexagon", name:"سداسي", sides:6},
+      ];
+      const s1 = pick(shapes);
+      const s2 = pick(shapes);
+      return {
+        title:"ورقة عمل: الأشكال الثنائية الأبعاد",
+        grade:"ثالث",
+        sec1Text:"تعرف على الأشكال:",
+        sec2Text:"تدريب إضافي:",
+        sec1:[
+          { id: uid(), type:"mcq", prompt:"اختر اسم الشكل:", options: shapes.map(x=>x.name), correctIndex: shapes.findIndex(x=>x.k===s1.k),
+            media: visuals ? { type:"svg", svg: svgPolygon(s1.k) } : null },
+          { id: uid(), type:"prompt", prompt:"كم عدد الأضلاع في الشكل؟", correct:s2.sides, answerType:"num",
+            media: visuals ? { type:"svg", svg: svgPolygon(s2.k) } : null }
+        ],
+        sec2:[
+          { id: uid(), type:"prompt", prompt:"اكتب عدد أضلاع المربع:", correct:4, answerType:"num" },
+          { id: uid(), type:"prompt", prompt:"اكتب عدد أضلاع المثلث:", correct:3, answerType:"num" },
+          { id: uid(), type:"mcq", prompt:"أي شكل له ٥ أضلاع؟", options:["مثلث","خماسي","مربع"], correctIndex:1 },
+          { id: uid(), type:"prompt", prompt:"اكتب إجابتك: كيف تميز بين المربع والمستطيل؟", correct:"", answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false } }
+        ]
+      };
+    }
+
+    function genSolids(level, visuals){
+      const solids = [
+        {k:"cube", name:"مكعب"},
+        {k:"sphere", name:"كرة"},
+        {k:"cylinder", name:"أسطوانة"},
+        {k:"cone", name:"مخروط"},
+      ];
+      const s1 = pick(solids);
+      const s2 = pick(solids);
+
+      return {
+        title:"ورقة عمل: المجسمات",
+        grade:"ثالث",
+        sec1Text:"تعرف على المجسمات:",
+        sec2Text:"تدريب إضافي:",
+        sec1:[
+          { id: uid(), type:"mcq", prompt:"اختر اسم المجسم:", options: solids.map(x=>x.name), correctIndex: solids.findIndex(x=>x.k===s1.k),
+            media: visuals ? { type:"svg", svg: svgSolid(s1.k) } : null },
+          { id: uid(), type:"mcq", prompt:"اختر اسم المجسم:", options: solids.map(x=>x.name), correctIndex: solids.findIndex(x=>x.k===s2.k),
+            media: visuals ? { type:"svg", svg: svgSolid(s2.k) } : null }
+        ],
+        sec2:[
+          { id: uid(), type:"prompt", prompt:"اكتب اسم مجسم له سطح منحني:", correct:"أسطوانة", answerType:"text" },
+          { id: uid(), type:"prompt", prompt:"اكتب اسم مجسم يشبه الكرة:", correct:"كرة", answerType:"text" },
+          { id: uid(), type:"mcq", prompt:"أي مجسم له رأس واحد؟", options:["مخروط","أسطوانة","مكعب"], correctIndex:0 },
+          { id: uid(), type:"prompt", prompt:"اكتب إجابتك: ما الفرق بين السطح المستوي والمنحني؟", correct:"", answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false } }
+        ]
+      };
+    }
+
+    function genEquations(level, visuals){
+      const a = randInt(4, 12);
+      const x = randInt(2, 12);
+      const b = x + a;
+
+      const m = randInt(2, 9);
+      const x2 = randInt(2, 10);
+      const prod = m * x2;
+
+      return {
+        title:"ورقة عمل: المعادلات",
+        grade:"ثالث",
+        sec1Text:"أوجد قيمة س:",
+        sec2Text:"تدريب إضافي:",
+        sec1:[
+          { id: uid(), type:"equation", eqText:"أوجد قيمة س:", equation:`س + ${toArabicDigits(a)} = ${toArabicDigits(b)}`, correct:x },
+          { id: uid(), type:"equation", eqText:"أوجد قيمة س:", equation:`${toArabicDigits(m)} × س = ${toArabicDigits(prod)}`, correct:x2 }
+        ],
+        sec2:[
+          { id: uid(), type:"equation", eqText:"أوجد قيمة س:", equation:`س − ${toArabicDigits(5)} = ${toArabicDigits(9)}`, correct:14 },
+          { id: uid(), type:"equation", eqText:"أوجد قيمة س:", equation:`س ÷ ${toArabicDigits(3)} = ${toArabicDigits(6)}`, correct:18 },
+          { id: uid(), type:"mcq", prompt:"اختر معادلة تمثل: (عدد + ٣ = ١٠)", options:["س + ٣ = ١٠","س − ٣ = ١٠","٣ × س = ١٠"], correctIndex:0 },
+          { id: uid(), type:"prompt", prompt:"اكتب إجابتك: ما معنى المجهول؟", correct:"", answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false } }
+        ]
+      };
+    }
+
+    function genFunctions(level, visuals){
+      const ruleType = pick(["+","×"]);
+      const n = (ruleType==="+") ? randInt(2,6) : randInt(2,4);
+      const inputs = [1,2,3,4].map(x=> x*randInt(1,3));
+      const outputs = inputs.map(x=> ruleType==="+" ? x+n : x*n);
+      const mask = [true,false,true,false];
+      const tableHtml = svgFunctionTable(
+        ruleType==="+" ? `+ ${toArabicDigits(n)}` : `× ${toArabicDigits(n)}`,
+        inputs, outputs, mask
+      );
+
+      return {
+        title:"ورقة عمل: جداول الدوال",
+        grade:"ثالث",
+        sec1Text:"أكمل جدول الدالة:",
+        sec2Text:"تدريب إضافي:",
+        sec1:[
+          { id: uid(), type:"table", tableHtml },
+          { id: uid(), type:"prompt", prompt:"اكتب إجابتك: صف القاعدة بكلماتك:", correct:"", answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false } }
+        ],
+        sec2:[
+          { id: uid(), type:"prompt", prompt:`إذا كانت القاعدة ${toArabicDigits(ruleType==="+" ? `+${n}` : `×${n}`)}، مخرج (٥) =`, correct: ruleType==="+" ? 5+n : 5*n, answerType:"num" },
+          { id: uid(), type:"prompt", prompt:`أكمل: المدخل ٨ ⟶ المخرج □`, correct: ruleType==="+" ? 8+n : 8*n, answerType:"num" },
+          { id: uid(), type:"mcq", prompt:"اختر القاعدة التي تحوّل ٣ إلى ١٢:", options:["×٤","+٩","÷٣"], correctIndex:0 },
+          { id: uid(), type:"prompt", prompt:"اكتب إجابتك: ما معنى (مدخل/مخرج)؟", correct:"", answerType:"text",
+            answerWrite:{ enabled:true, prompt:"اكتب إجابتك:", lines:2, required:false } }
+        ]
+      };
+    }
+
+    function topicLabel(topic){
+      return {
+        add:"جمع",
+        sub:"طرح",
+        mul:"ضرب",
+        div:"قسمة",
+        fractions:"كسور",
+        shape2d:"أشكال ثنائية الأبعاد",
+        solids:"مجسمات",
+        equations:"معادلات",
+        functions:"جداول دوال"
+      }[topic] || "رياضيات";
+    }
+
+    // ===== Auto orchestrator =====
+    function generateAuto(){
+      const title = ($('#autoTitle').value || '').trim() || "ورقة عمل رياضيات";
+      const topicSel = $('#autoTopic').value;
+      const level = $('#autoLevel').value;
+      const visuals = $('#autoVisuals').checked;
+
+      const topic = (topicSel === "auto") ? detectTopicFromTitle(title) : topicSel;
+
+      let ws;
+      if(topic==="add") ws = genAdd(level, visuals);
+      else if(topic==="sub") ws = genSub(level, visuals);
+      else if(topic==="mul") ws = genMul(level, visuals);
+      else if(topic==="div") ws = genDiv(level, title, visuals);
+      else if(topic==="fractions") ws = genFractions(level, visuals);
+      else if(topic==="shape2d") ws = genShape2D(level, visuals);
+      else if(topic==="solids") ws = genSolids(level, visuals);
+      else if(topic==="equations") ws = genEquations(level, visuals);
+      else ws = genFunctions(level, visuals);
+
+      ws.title = title;
+      renderWorksheet(ws);
+      showToast(`تم توليد ورقة: ${topicLabel(topic)}`, "ok");
+    }
+
+    // ===== Custom builder state =====
+    const state = {
+      mode:"auto",
+      custom:{
+        title:"ورقة عمل رياضيات",
+        grade:"ثالث",
+        sec1Text:"أجب عن الأسئلة التالية:",
+        sec2Text:"تدريب إضافي:",
+        questions:[]
+      },
+      editId:null,
+      pendingImages:[]
+    };
+
+    function saveCustomLocal(){
+      try{ localStorage.setItem("mw_custom_v3", JSON.stringify(state.custom)); }catch(e){}
+    }
+    function loadCustomLocal(){
+      try{
+        const s = localStorage.getItem("mw_custom_v3");
+        if(!s) return;
+        const obj = JSON.parse(s);
+        if(obj && Array.isArray(obj.questions)) state.custom = obj;
+      }catch(e){}
+    }
+
+    function syncCustomHeader(){
+      state.custom.title = ($('#customTitle').value||'').trim() || "ورقة عمل رياضيات";
+      state.custom.grade = ($('#customGrade').value||'ثالث').trim() || "ثالث";
+      state.custom.sec1Text = ($('#customSec1Text').value||'').trim() || "القسم (١)";
+      state.custom.sec2Text = ($('#customSec2Text').value||'').trim() || "القسم (٢)";
+      saveCustomLocal();
+    }
+
+    function buildWorksheetFromCustom(){
+      const sec1=[], sec2=[];
+      state.custom.questions.forEach(q=> (q.section===1?sec1:sec2).push(q));
+      return {
+        title: state.custom.title,
+        grade: state.custom.grade,
+        sec1Text: state.custom.sec1Text,
+        sec2Text: state.custom.sec2Text,
+        sec1, sec2
+      };
+    }
+
+    function renderCustomPreview(){
+      renderWorksheet(buildWorksheetFromCustom());
+    }
+
+    // ===== Custom type fields =====
+    function setTypeFields(){
+      const type = $('#qType').value;
+      const box = $('#typeFields');
+      box.innerHTML = '';
+
+      const make = (html)=>{ box.innerHTML = html; };
+
+      if(type==="prompt"){
+        make(`
+          <div class="row">
+            <div class="col">
+              <label for="fPrompt">نص السؤال</label>
+              <textarea id="fPrompt" placeholder="اكتب السؤال هنا..."></textarea>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <div class="col small">
+              <label for="fAnsType">نوع الإجابة</label>
+              <select id="fAnsType">
+                <option value="num" selected>رقمية</option>
+                <option value="text">نصية</option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="fCorrect">الإجابة الصحيحة (اختياري)</label>
+              <input id="fCorrect" type="text" placeholder="اتركها فارغة إذا لا تريد التحقق">
+            </div>
+          </div>
+        `);
+      }
+
+      if(type==="expr"){
+        make(`
+          <div class="row">
+            <div class="col small">
+              <label for="eOp">العملية</label>
+              <select id="eOp">
+                <option value="+">جمع</option>
+                <option value="−">طرح</option>
+                <option value="×">ضرب</option>
+                <option value="÷" selected>قسمة</option>
+              </select>
+            </div>
+            <div class="col small">
+              <label for="eRight">العدد (يمين)</label>
+              <input id="eRight" type="text" inputmode="numeric" placeholder="مثال: ٨">
+            </div>
+            <div class="col small">
+              <label for="eLeft">العدد (يسار)</label>
+              <input id="eLeft" type="text" inputmode="numeric" placeholder="مثال: ٢">
+            </div>
+            <div class="col">
+              <label for="eCorrect">الإجابة الصحيحة (اختياري)</label>
+              <input id="eCorrect" type="text" placeholder="اتركها فارغة للحساب التلقائي">
+            </div>
+          </div>
+        `);
+
+        ["eRight","eLeft","eCorrect"].forEach(id=>{
+          setTimeout(()=>{
+            const el = document.getElementById(id);
+            if(!el) return;
+            el.addEventListener('input', ()=>{
+              const raw = toWesternDigits(el.value).replace(/[^\d-]/g,'');
+              el.value = toArabicDigits(raw);
+            });
+          },0);
+        });
+      }
+
+      if(type==="fraction"){
+        make(`
+          <div class="row">
+            <div class="col small">
+              <label for="frNum">البسط</label>
+              <input id="frNum" type="text" inputmode="numeric" placeholder="٣">
+            </div>
+            <div class="col small">
+              <label for="frDen">المقام</label>
+              <input id="frDen" type="text" inputmode="numeric" placeholder="٤">
+            </div>
+            <div class="col">
+              <label for="frPrompt">نص السؤال</label>
+              <input id="frPrompt" type="text" value="اكتب الكسر الممثل بالشكل:">
+            </div>
+          </div>
+        `);
+        ["frNum","frDen"].forEach(id=>{
+          setTimeout(()=>{
+            const el=document.getElementById(id);
+            el.addEventListener('input', ()=>{
+              const raw = toWesternDigits(el.value).replace(/[^\d]/g,'');
+              el.value = toArabicDigits(raw);
+            });
+          },0);
+        });
+      }
+
+      if(type==="shape2d"){
+        make(`
+          <div class="row">
+            <div class="col small">
+              <label for="shKind">الشكل</label>
+              <select id="shKind">
+                <option value="triangle">مثلث</option>
+                <option value="square">مربع</option>
+                <option value="rectangle">مستطيل</option>
+                <option value="pentagon">خماسي</option>
+                <option value="hexagon">سداسي</option>
+              </select>
+            </div>
+            <div class="col small">
+              <label for="shAsk">السؤال</label>
+              <select id="shAsk">
+                <option value="name" selected>اسم الشكل</option>
+                <option value="sides">عدد الأضلاع</option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="shPrompt">نص السؤال</label>
+              <input id="shPrompt" type="text" value="أجب عن السؤال:">
+            </div>
+          </div>
+        `);
+      }
+
+      if(type==="solid"){
+        make(`
+          <div class="row">
+            <div class="col small">
+              <label for="soKind">المجسم</label>
+              <select id="soKind">
+                <option value="cube">مكعب</option>
+                <option value="sphere">كرة</option>
+                <option value="cylinder">أسطوانة</option>
+                <option value="cone">مخروط</option>
+              </select>
+            </div>
+            <div class="col small">
+              <label for="soAsk">السؤال</label>
+              <select id="soAsk">
+                <option value="name" selected>اسم المجسم</option>
+                <option value="describe">وصف قصير</option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="soPrompt">نص السؤال</label>
+              <input id="soPrompt" type="text" value="أجب عن السؤال:">
+            </div>
+          </div>
+        `);
+      }
+
+      if(type==="equation"){
+        make(`
+          <div class="row">
+            <div class="col small">
+              <label for="eqTpl">نوع المعادلة</label>
+              <select id="eqTpl">
+                <option value="xplus" selected>س + a = b</option>
+                <option value="xminus">س − a = b</option>
+                <option value="mul">m × س = b</option>
+                <option value="div">س ÷ d = b</option>
+              </select>
+            </div>
+            <div class="col small">
+              <label for="eqA">a / m / d</label>
+              <input id="eqA" type="text" inputmode="numeric" placeholder="٣">
+            </div>
+            <div class="col small">
+              <label for="eqX">قيمة س</label>
+              <input id="eqX" type="text" inputmode="numeric" placeholder="٥">
+            </div>
+            <div class="col">
+              <label for="eqPrompt">عنوان السؤال</label>
+              <input id="eqPrompt" type="text" value="أوجد قيمة س:">
+            </div>
+          </div>
+        `);
+        ["eqA","eqX"].forEach(id=>{
+          setTimeout(()=>{
+            const el=document.getElementById(id);
+            el.addEventListener('input', ()=>{
+              const raw = toWesternDigits(el.value).replace(/[^\d-]/g,'');
+              el.value = toArabicDigits(raw);
+            });
+          },0);
+        });
+      }
+
+      if(type==="functionTable"){
+        make(`
+          <div class="row">
+            <div class="col small">
+              <label for="fnRuleType">القاعدة</label>
+              <select id="fnRuleType">
+                <option value="+">+ إضافة</option>
+                <option value="×" selected>× ضرب</option>
+              </select>
+            </div>
+            <div class="col small">
+              <label for="fnN">العدد</label>
+              <input id="fnN" type="text" inputmode="numeric" placeholder="٢">
+            </div>
+            <div class="col">
+              <label for="fnInputs">المدخلات (افصل بفواصل)</label>
+              <input id="fnInputs" type="text" value="١,٢,٣,٤">
+            </div>
+            <div class="col">
+              <label for="fnPrompt">نص السؤال</label>
+              <input id="fnPrompt" type="text" value="أكمل جدول الدالة:">
+            </div>
+          </div>
+        `);
+        setTimeout(()=>{
+          const el=document.getElementById('fnN');
+          el.addEventListener('input', ()=>{
+            const raw = toWesternDigits(el.value).replace(/[^\d]/g,'');
+            el.value = toArabicDigits(raw);
+          });
+        },0);
+      }
+
+      if(type==="mcq"){
+        make(`
+          <div class="row">
+            <div class="col">
+              <label for="mcqPrompt">نص السؤال</label>
+              <textarea id="mcqPrompt" placeholder="اكتب السؤال هنا..."></textarea>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <div class="col">
+              <label for="mcqOptions">الخيارات (كل خيار في سطر)</label>
+              <textarea id="mcqOptions" placeholder="خيار 1\nخيار 2\nخيار 3\nخيار 4"></textarea>
+            </div>
+            <div class="col small">
+              <label for="mcqCorrect">الخيار الصحيح</label>
+              <select id="mcqCorrect">
+                <option value="1" selected>١</option>
+                <option value="2">٢</option>
+                <option value="3">٣</option>
+                <option value="4">٤</option>
+              </select>
+            </div>
+          </div>
+        `);
+      }
+    }
+
+    // ===== Extras from form =====
+    function getExtrasFromForm(){
+      const answerWrite = $('#xAnswerWrite').checked ? {
+        enabled:true,
+        prompt: ($('#xAnswerPrompt').value || "اكتب إجابتك:").trim(),
+        lines: parseInt($('#xAnswerLines').value||'2',10),
+        required: $('#xAnswerRequired').checked
+      } : { enabled:false };
+
+      const facts = $('#xFacts').checked ? {
+        enabled:true,
+        prompt: ($('#xFactsPrompt').value || "اكتب الحقائق المترابطة:").trim(),
+        required: $('#xFactsRequired').checked,
+        key: ($('#xFactsKey').value || "").trim()
+      } : { enabled:false };
+
+      return { answerWrite, facts };
+    }
+
+    // ===== Images =====
+    function setPendingImages(urls){
+      state.pendingImages = urls.slice(0,2);
+      const box = $('#imgPreview'); box.innerHTML='';
+      state.pendingImages.forEach(src=>{
+        const img=document.createElement('img');
+        img.className='thumb'; img.src=src; img.alt='صورة';
+        box.appendChild(img);
+      });
+    }
+
+    async function readFilesToDataUrls(fileList){
+      const files = Array.from(fileList || []).slice(0,2);
+      const urls = [];
+      for(const f of files){
+        const url = await new Promise((resolve, reject)=>{
+          const r = new FileReader();
+          r.onload = ()=> resolve(String(r.result || ""));
+          r.onerror = reject;
+          r.readAsDataURL(f);
+        });
+        urls.push(url);
+      }
+      return urls;
+    }
+
+    // ===== Build custom question =====
+    function buildQuestionFromForm(){
+      const section = parseInt($('#qSection').value,10);
+      const typeSel = $('#qType').value;
+      const extras = getExtrasFromForm();
+
+      const q = { id: state.editId || uid(), section, answerWrite: extras.answerWrite, facts: extras.facts };
+
+      if(state.pendingImages.length){
+        q.media = { type:"images", images: state.pendingImages.slice(0,2) };
+      }
+
+      if(typeSel==="prompt"){
+        q.type="prompt";
+        q.prompt = ($('#fPrompt').value||'').trim();
+        q.answerType = ($('#fAnsType').value==="text") ? "text" : "num";
+        q.correct = ($('#fCorrect').value||'').trim();
+      }
+
+      if(typeSel==="expr"){
+        q.type="expr";
+        q.op = $('#eOp').value;
+        const right = parseNum($('#eRight').value);
+        const left = parseNum($('#eLeft').value);
+        q.right = Number.isFinite(right) ? right : 0;
+        q.left  = Number.isFinite(left) ? left : 0;
+        q.answerType = "num";
+
+        const cRaw = ($('#eCorrect').value||'').trim();
+        if(cRaw){
+          const cMan = parseNum(cRaw);
+          q.correct = Number.isFinite(cMan) ? cMan : "";
+        }else{
+          if(q.op==="+") q.correct = q.right + q.left;
+          else if(q.op==="−") q.correct = q.right - q.left;
+          else if(q.op==="×") q.correct = q.right * q.left;
+          else if(q.op==="÷") q.correct = (q.left!==0 && q.right%q.left===0) ? (q.right/q.left) : "";
+        }
+        q.prompt = "احسب:";
+      }
+
+      if(typeSel==="fraction"){
+        const numer = clamp(parseNum($('#frNum').value)||1, 1, 12);
+        const denom = clamp(parseNum($('#frDen').value)||2, 2, 12);
+        q.type="prompt";
+        q.prompt = ($('#frPrompt').value||'اكتب الكسر الممثل بالشكل:').trim();
+        q.answerType="frac";
+        q.correct = `${numer}/${denom}`;
+        q.media = { type:"svg", svg: svgFractionBar(numer, denom) };
+      }
+
+      if(typeSel==="shape2d"){
+        const kind = $('#shKind').value;
+        const ask = $('#shAsk').value;
+        const prompt = ($('#shPrompt').value||'أجب عن السؤال:').trim();
+        const map = {
+          triangle:{name:"مثلث", sides:3},
+          square:{name:"مربع", sides:4},
+          rectangle:{name:"مستطيل", sides:4},
+          pentagon:{name:"خماسي", sides:5},
+          hexagon:{name:"سداسي", sides:6}
+        }[kind];
+        q.type="prompt";
+        q.prompt = prompt + (ask==="name" ? " (اكتب الاسم)" : " (اكتب عدد الأضلاع)");
+        q.answerType = (ask==="name") ? "text" : "num";
+        q.correct = (ask==="name") ? map.name : map.sides;
+        q.media = { type:"svg", svg: svgPolygon(kind) };
+      }
+
+      if(typeSel==="solid"){
+        const kind = $('#soKind').value;
+        const ask = $('#soAsk').value;
+        const prompt = ($('#soPrompt').value||'أجب عن السؤال:').trim();
+        const map = { cube:"مكعب", sphere:"كرة", cylinder:"أسطوانة", cone:"مخروط" };
+        q.type="prompt";
+        q.prompt = prompt + (ask==="name" ? " (اكتب الاسم)" : " (اكتب وصفًا قصيرًا)");
+        q.answerType="text";
+        q.correct = (ask==="name") ? map[kind] : "";
+        q.media = { type:"svg", svg: svgSolid(kind) };
+      }
+
+      if(typeSel==="equation"){
+        const tpl = $('#eqTpl').value;
+        const a = parseNum($('#eqA').value)||2;
+        const x = parseNum($('#eqX').value)||2;
+        q.type="equation";
+        q.eqText = ($('#eqPrompt').value||'أوجد قيمة س:').trim();
+        if(tpl==="xplus"){
+          q.correct = x;
+          q.equation = `س + ${toArabicDigits(a)} = ${toArabicDigits(x+a)}`;
+        }else if(tpl==="xminus"){
+          q.correct = x;
+          q.equation = `س − ${toArabicDigits(a)} = ${toArabicDigits(x-a)}`;
+        }else if(tpl==="mul"){
+          q.correct = x;
+          q.equation = `${toArabicDigits(a)} × س = ${toArabicDigits(a*x)}`;
+        }else{
+          q.correct = a*x;
+          q.equation = `س ÷ ${toArabicDigits(a)} = ${toArabicDigits(x)}`;
+        }
+      }
+
+      if(typeSel==="functionTable"){
+        const rt = $('#fnRuleType').value;
+        const n = parseNum($('#fnN').value)||2;
+        const inputsRaw = ($('#fnInputs').value||'1,2,3,4')
+          .split(',').map(s=> parseNum(s)).filter(v=>Number.isFinite(v)).slice(0,6);
+        const inputs = inputsRaw.length ? inputsRaw : [1,2,3,4];
+        const outputs = inputs.map(x=> rt==="+" ? x+n : x*n);
+        const mask = inputs.map((_,i)=> i%2===0);
+        q.type="table";
+        q.prompt = ($('#fnPrompt').value||'أكمل جدول الدالة:').trim();
+        q.tableHtml = svgFunctionTable(rt==="+" ? `+ ${toArabicDigits(n)}` : `× ${toArabicDigits(n)}`, inputs, outputs, mask);
+      }
+
+      if(typeSel==="mcq"){
+        q.type="mcq";
+        q.prompt = ($('#mcqPrompt').value||'').trim();
+        const lines = ($('#mcqOptions').value||'').split('\n').map(s=>s.trim()).filter(Boolean);
+        q.options = lines.length ? lines.slice(0,6) : ["خيار ١","خيار ٢","خيار ٣","خيار ٤"];
+        const correct = parseInt($('#mcqCorrect').value||'1',10)-1;
+        q.correctIndex = clamp(correct, 0, q.options.length-1);
+      }
+
+      return q;
+    }
+
+    function resetBuilder(){
+      state.editId = null;
+      $('#btnSaveQuestion').textContent = '➕ إضافة السؤال';
+      $('#btnCancelEdit').style.display = 'none';
+      $('#qSection').value = "2";
+      $('#qType').value = "prompt";
+      setTypeFields();
+      setPendingImages([]);
+
+      $('#xAnswerWrite').checked = false;
+      $('#xAnswerWriteBox').style.display = "none";
+      $('#xAnswerPrompt').value = "اكتب إجابتك:";
+      $('#xAnswerLines').value = "2";
+      $('#xAnswerRequired').checked = false;
+
+      $('#xFacts').checked = false;
+      $('#xFactsBox').style.display = "none";
+      $('#xFactsPrompt').value = "اكتب الحقائق المترابطة:";
+      $('#xFactsRequired').checked = false;
+      $('#xFactsKey').value = "";
+    }
+
+    function renderQuestionList(){
+      const list = $('#questionList');
+      list.innerHTML = '';
+      if(state.custom.questions.length===0){
+        const d = document.createElement('div');
+        d.style.fontWeight="1000";
+        d.style.color="rgba(17,24,39,.65)";
+        d.textContent = "لا يوجد أسئلة بعد.";
+        list.appendChild(d);
+        return;
+      }
+
+      state.custom.questions.forEach((q, idx)=>{
+        const item = document.createElement('div');
+        item.className = 'qItem';
+
+        const meta = document.createElement('div');
+        meta.className='qMeta';
+
+        const extrasBadges = [];
+        if(q.answerWrite?.enabled) extrasBadges.push('إجابة مكتوبة');
+        if(q.facts?.enabled) extrasBadges.push('حقائق');
+
+        const kind = q.type === "expr" ? "تعبير" :
+                     q.type === "equation" ? "معادلة" :
+                     q.type === "table" ? "جدول" :
+                     q.type === "mcq" ? "اختيار" : "سؤال";
+
+        const summary = q.type==="expr"
+          ? `${toArabicDigits(q.right)} ${q.op} ${toArabicDigits(q.left)}`
+          : (q.type==="equation" ? (q.equation||"") : (q.prompt||"").slice(0,60));
+
+        meta.innerHTML = `
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <span class="pill">س${toArabicDigits(idx+1)}</span>
+            <span class="pill">قسم ${toArabicDigits(q.section)}</span>
+            <span class="pill">${kind}</span>
+            ${extrasBadges.map(x=>`<span class="pill">${x}</span>`).join('')}
+          </div>
+          <div style="margin-top:6px;">${toArabicDigits(summary)}</div>
+        `;
+
+        if(q.media?.type==="images" && q.media.images?.length){
+          const thumbs = document.createElement('div');
+          thumbs.className='thumbs';
+          q.media.images.slice(0,2).forEach(src=>{
+            const img=document.createElement('img');
+            img.className='thumb'; img.src=src; img.alt='صورة';
+            thumbs.appendChild(img);
+          });
+          meta.appendChild(thumbs);
+        }
+
+        const actions = document.createElement('div');
+        actions.className='qActions';
+
+        const up = document.createElement('button');
+        up.className='btn ghost'; up.textContent='⬆️'; up.type='button';
+        up.disabled = idx===0;
+        up.addEventListener('click', ()=>{
+          const arr = state.custom.questions;
+          [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]];
+          saveCustomLocal();
+          renderQuestionList();
+          renderCustomPreview();
+        });
+
+        const down = document.createElement('button');
+        down.className='btn ghost'; down.textContent='⬇️'; down.type='button';
+        down.disabled = idx===state.custom.questions.length-1;
+        down.addEventListener('click', ()=>{
+          const arr = state.custom.questions;
+          [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]];
+          saveCustomLocal();
+          renderQuestionList();
+          renderCustomPreview();
+        });
+
+        const edit = document.createElement('button');
+        edit.className='btn'; edit.textContent='✏️ تعديل'; edit.type='button';
+        edit.addEventListener('click', ()=> startEdit(q.id));
+
+        const del = document.createElement('button');
+        del.className='btn danger'; del.textContent='🗑️ حذف'; del.type='button';
+        del.addEventListener('click', ()=>{
+          state.custom.questions = state.custom.questions.filter(x=>x.id!==q.id);
+          saveCustomLocal();
+          renderQuestionList();
+          renderCustomPreview();
+          if(state.editId===q.id) resetBuilder();
+          showToast("تم حذف السؤال", "ok");
+        });
+
+        actions.appendChild(up);
+        actions.appendChild(down);
+        actions.appendChild(edit);
+        actions.appendChild(del);
+
+        item.appendChild(meta);
+        item.appendChild(actions);
+        list.appendChild(item);
+      });
+    }
+
+    function startEdit(id){
+      const q = state.custom.questions.find(x=>x.id===id);
+      if(!q) return;
+
+      state.editId = id;
+      $('#btnSaveQuestion').textContent = '💾 حفظ';
+      $('#btnCancelEdit').style.display = 'inline-flex';
+
+      $('#qSection').value = String(q.section);
+
+      // map to builder type
+      if(q.type==="prompt") $('#qType').value = "prompt";
+      else if(q.type==="expr") $('#qType').value = "expr";
+      else if(q.type==="equation") $('#qType').value = "equation";
+      else if(q.type==="table") $('#qType').value = "functionTable";
+      else if(q.type==="mcq") $('#qType').value = "mcq";
+      else $('#qType').value = "prompt";
+
+      setTypeFields();
+
+      // images
+      if(q.media?.type==="images") setPendingImages(q.media.images||[]);
+      else setPendingImages([]);
+
+      // extras
+      $('#xAnswerWrite').checked = !!q.answerWrite?.enabled;
+      $('#xAnswerWriteBox').style.display = $('#xAnswerWrite').checked ? "block":"none";
+      $('#xAnswerPrompt').value = q.answerWrite?.prompt || "اكتب إجابتك:";
+      $('#xAnswerLines').value = String(q.answerWrite?.lines || 2);
+      $('#xAnswerRequired').checked = !!q.answerWrite?.required;
+
+      $('#xFacts').checked = !!q.facts?.enabled;
+      $('#xFactsBox').style.display = $('#xFacts').checked ? "block":"none";
+      $('#xFactsPrompt').value = q.facts?.prompt || "اكتب الحقائق المترابطة:";
+      $('#xFactsRequired').checked = !!q.facts?.required;
+      $('#xFactsKey').value = q.facts?.key || "";
+
+      setTimeout(()=>{
+        if(q.type==="prompt"){
+          $('#fPrompt').value = q.prompt || "";
+          $('#fAnsType').value = (q.answerType==="text") ? "text" : "num";
+          $('#fCorrect').value = q.correct ? String(q.correct) : "";
+        }
+        if(q.type==="expr"){
+          $('#eOp').value = q.op || "÷";
+          $('#eRight').value = toArabicDigits(q.right ?? "");
+          $('#eLeft').value  = toArabicDigits(q.left ?? "");
+          $('#eCorrect').value = (q.correct!=="" && q.correct!==null && q.correct!==undefined) ? toArabicDigits(q.correct) : "";
+        }
+        if(q.type==="mcq"){
+          $('#mcqPrompt').value = q.prompt || "";
+          $('#mcqOptions').value = (q.options||[]).join("\n");
+          $('#mcqCorrect').value = String((q.correctIndex||0)+1);
+        }
+      },0);
+
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    // ===== Export/Import =====
+    function downloadJSON(obj, filename="worksheet.json"){
+      const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    $('#btnExport').addEventListener('click', ()=>{
+      syncCustomHeader();
+      downloadJSON(state.custom, "worksheet_custom.json");
+      showToast("تم تصدير الملف", "ok");
+    });
+
+    $('#importFile').addEventListener('change', async (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      try{
+        const txt = await file.text();
+        const obj = JSON.parse(txt);
+        if(!obj || !Array.isArray(obj.questions)) throw new Error("bad");
+        state.custom = obj;
+
+        $('#customTitle').value = state.custom.title || "ورقة عمل رياضيات";
+        $('#customGrade').value = state.custom.grade || "ثالث";
+        $('#customSec1Text').value = state.custom.sec1Text || "القسم (١)";
+        $('#customSec2Text').value = state.custom.sec2Text || "القسم (٢)";
+
+        saveCustomLocal();
+        renderQuestionList();
+        renderCustomPreview();
+        resetBuilder();
+        showToast("تم استيراد الملف", "ok");
+      }catch(err){
+        showToast("تعذر استيراد الملف", "bad");
+      }finally{
+        e.target.value = "";
+      }
+    });
+
+    // ===== Wire UI =====
+    $('#btnAutoGenerate').addEventListener('click', generateAuto);
+
+    $('#qType').addEventListener('change', setTypeFields);
+
+    $('#qImages').addEventListener('change', async (e)=>{
+      const urls = await readFilesToDataUrls(e.target.files);
+      setPendingImages(urls);
+      e.target.value = "";
+    });
+
+    $('#btnClearImages').addEventListener('click', ()=> setPendingImages([]));
+
+    $('#xAnswerWrite').addEventListener('change', ()=> $('#xAnswerWriteBox').style.display = $('#xAnswerWrite').checked ? "block":"none");
+    $('#xFacts').addEventListener('change', ()=> $('#xFactsBox').style.display = $('#xFacts').checked ? "block":"none");
+
+    $('#btnCancelEdit').addEventListener('click', resetBuilder);
+
+    $('#btnSaveQuestion').addEventListener('click', ()=>{
+      syncCustomHeader();
+      const q = buildQuestionFromForm();
+
+      const idx = state.custom.questions.findIndex(x=>x.id===q.id);
+      if(idx>=0) state.custom.questions[idx] = q;
+      else state.custom.questions.push(q);
+
+      saveCustomLocal();
+      renderQuestionList();
+      renderCustomPreview();
+      resetBuilder();
+      showToast("تم حفظ السؤال", "ok");
+    });
+
+    ['customTitle','customGrade','customSec1Text','customSec2Text'].forEach(id=>{
+      const el=document.getElementById(id);
+      el.addEventListener('input', ()=>{
+        syncCustomHeader();
+        renderCustomPreview();
+      });
+      el.addEventListener('change', ()=>{
+        syncCustomHeader();
+        renderCustomPreview();
+      });
+    });
+
+    function setMode(mode){
+      state.mode = mode;
+      $('#tabAuto').classList.toggle('active', mode==="auto");
+      $('#tabCustom').classList.toggle('active', mode==="custom");
+      $('#autoPanel').style.display = (mode==="auto") ? "block" : "none";
+      $('#customPanel').style.display = (mode==="custom") ? "block" : "none";
+
+      if(mode==="auto"){
+        generateAuto();
+      }else{
+        syncCustomHeader();
+        renderQuestionList();
+        renderCustomPreview();
+      }
+    }
+
+    $('#tabAuto').addEventListener('click', ()=> setMode("auto"));
+    $('#tabCustom').addEventListener('click', ()=> setMode("custom"));
+
+    // ===== Check/Clear/Print =====
+    function checkAll(){
+      let total=0, ok=0;
+
+      // answers
+      $$('.ans').forEach(inp=>{
+        const at = inp.dataset.atype || "num";
+        const correct = inp.dataset.correct || "";
+        inp.classList.remove('correct','wrong');
+        if(!correct) return;
+
+        total++;
+        if(at==="num"){
+          const v = parseNum(inp.value);
+          const c = parseInt(correct,10);
+          if(Number.isFinite(v) && v===c){ ok++; inp.classList.add('correct'); }
+          else inp.classList.add('wrong');
+        }else if(at==="frac"){
+          const v = normalizeFrac(inp.value);
+          if(v && v===correct){ ok++; inp.classList.add('correct'); }
+          else inp.classList.add('wrong');
+        }else{
+          const v = normalizeText(inp.value);
+          if(v && v===correct){ ok++; inp.classList.add('correct'); }
+          else inp.classList.add('wrong');
+        }
+      });
+
+      // required written answers
+      $$('.noteInput').forEach(el=>{
+        const req = (el.dataset.required==="1");
+        el.classList.remove('ok','bad');
+        if(!req) return;
+        total++;
+        if(el.value.trim()){ ok++; el.classList.add('ok'); }
+        else el.classList.add('bad');
+      });
+
+      // related facts
+      $$('.factsInput').forEach(el=>{
+        const req = (el.dataset.required==="1");
+        const key = (el.dataset.key||"").trim();
+        el.classList.remove('ok','bad');
+
+        const v = el.value.trim();
+        if(!req && !v) return;
+
+        total++;
+        if(req && !v){ el.classList.add('bad'); return; }
+
+        if(key){
+          const accepted = key.split('|').map(s=> normalizeFact(s)).filter(Boolean);
+          const vv = normalizeFact(v);
+          if(vv && accepted.includes(vv)){ ok++; el.classList.add('ok'); }
+          else el.classList.add('bad');
+        }else{
+          if(v){ ok++; el.classList.add('ok'); }
+          else el.classList.add('bad');
+        }
+      });
+
+      if(total===0) showToast("لا يوجد مفاتيح للتحقق", "bad");
+      else showToast(`تم التحقق: ${ok} من ${total}`, ok===total ? "ok" : "");
+    }
+
+    function clearAll(){
+      $$('.ans').forEach(inp=>{ inp.value=''; inp.classList.remove('correct','wrong'); });
+      $$('.noteInput').forEach(t=>{ t.value=''; t.classList.remove('ok','bad'); });
+      $$('.factsInput').forEach(t=>{ t.value=''; t.classList.remove('ok','bad'); });
+      $$('.mcqCircle').forEach(c=> c.classList.remove('fill'));
+      showToast("تم المسح", "ok");
+    }
+
+    $('#btnCheck').addEventListener('click', checkAll);
+    $('#btnClear').addEventListener('click', clearAll);
+    $('#btnPrint').addEventListener('click', ()=> window.print());
+
+    // ===== Init =====
+    loadCustomLocal();
+
+    $('#customTitle').value = state.custom.title || "ورقة عمل رياضيات";
+    $('#customGrade').value = state.custom.grade || "ثالث";
+    $('#customSec1Text').value = state.custom.sec1Text || "أجب عن الأسئلة التالية:";
+    $('#customSec2Text').value = state.custom.sec2Text || "تدريب إضافي:";
+
+    setTypeFields();
+    renderQuestionList();
+
+    // Default: auto mode
+    setMode("auto");
+  </script>
+</body>
+</html>
